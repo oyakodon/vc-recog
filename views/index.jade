@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  h1= title
+  section#audios
+  
+  form.form-horizontal(name="callForm", ng-submit="startCall()", ng-show="form_enabled", novalidate)
+    div.form-group
+      label.col-xs-1.control-label 名前 : 
+      div.col-xs-3
+        input.form-control(type="text", ng-model="name", required)
+    
+    div.form-group
+      div.col-xs-offset-1.col-xs-10
+        button.btn.btn-primary(type="submit", ng-disabled="callForm.$invalid") 通話開始
+  
+  h3 議事録(的にな何か)
+  pre {{ chat }}
+  
+  h3 認識中の内容
+  textarea(rows="3" cols="75" ng-model="interimArea")
+  
+  h3 ( ログ )
+  pre {{ log }}
+
+block scripts
+  script(src='/socket.io/socket.io.js')
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js")
+  script(src='/javascripts/index.js')
