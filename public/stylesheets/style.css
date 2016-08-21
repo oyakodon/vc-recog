@@ -1,0 +1,15 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+pre.log {
+  border : 3px double black;
+  background-color:#F0F0F0;
+  width : 50%;
+  padding : 10px;
+}

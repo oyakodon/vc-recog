@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  h1= title
+  section#audios
+    p(ng-show="!btn_enabled") Loading...
+  
+  form(name="callForm", ng-submit="startCall()", ng-show="form_enabled", novalidate)
+    label 名前 : 
+    input(type="text", ng-model="name", required)
+    br
+    input(type="submit", ng-disabled="callForm.$invalid || !form_enabled", value="通話開始")
+  
+  pre.log {{ log }}
+
+block scripts
+  script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.1/angular.min.js')
+  script(src='/socket.io/socket.io.js')
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js")
+  script(src='/javascripts/index.js')
