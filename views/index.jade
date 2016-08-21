@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  h1= title
+  
+  button.btn.btn-primary(ng-click="startRec()", ng-disabled="startDisable", style="margin-right : 10px") 録音開始
+  button.btn.btn-danger(ng-click="stopRec()", ng-disabled="stopDisable", style="margin-right : 10px") 認識停止
+  button.btn.btn-success(ng-click="reset()") 内容リセット
+  
+  h3 確定した認識内容
+  textarea(rows="5" cols="75" ng-model="finalArea")
+  
+  h3 不確かな認識内容
+  textarea(rows="5" cols="75" ng-model="interimArea")
+  
+  h3 (ログ)
+  pre.log {{ log }}
+
+block scripts
+  script(src='/socket.io/socket.io.js')
+  script(src='/javascripts/index.js')
