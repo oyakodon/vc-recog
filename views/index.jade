@@ -15,13 +15,15 @@ block content
         button.btn.btn-primary(type="submit", ng-disabled="callForm.$invalid") 通話開始
   
   h3 議事録(的にな何か)
-  pre {{ chat }}
+  pre(style="width: 50%;") {{ chat }}
   
-  h3 認識中の内容
-  textarea(rows="3" cols="75" ng-model="interimArea")
+  pre(style="width: 30%;")
+    img(style="border: 1px solid black;", ng-show="mic_anime_visible", src="/images/mic_animated.gif", height="30", align="right")
+    img(style="border: 1px solid black;", ng-show="mic_stop_visible", src="/images/mic_stop.png", height="30", align="right")
+    {{ "* 認識中の内容\n" + interimArea }}
   
   h3 ( ログ )
-  pre {{ log }}
+  pre(style="width: 50%;") {{ log }}
 
 block scripts
   script(src='/socket.io/socket.io.js')

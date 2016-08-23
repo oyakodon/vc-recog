@@ -4,9 +4,14 @@
       $scope.log = "AngularJS 正常\n";
       $scope.chat = "";
       $scope.form_enabled = true;
+      $scope.mic_anime_visible = false;
+      $scope.mic_stop_visible = true;
+      
+      var flag_speech = false;
+      var flag_talking = false;
+      
       var socket;
-      var recog;
-      var recog_text = "";
+      var peer;
       
       // 環境変更時、修正必須!
       var peerOptions = {
@@ -33,38 +38,11 @@
           if ($window.webkitSpeechRecognition){
             $scope.log += "このブラウザは speechRecognition 対応\n";
             
-            recog = new $window.webkitSpeechRecognition();
-            recog.continuous = true;
-            recog.interimResults = true;
-            recog.lang = 'ja-JP';
+            vr();
             
-            recog.onresult = function(e) {
-              var interimText = '';
-              var finalText = e.results[e.results.length - 1][0].transcript;
-              
-              for (var i = 0; i < e.results.length; i++) {
-                if (!e.results[i].isFinal) {
-                    interimText += e.results[i][0].transcript + "\n";
-                }
-              }
-              
-              $scope.interimArea = interimText;
-              
-              if (recog_text != finalText){
-                $timeout(function() {
-                  $scope.log += "[音声認識] " + finalText + "\n";
-                  socket.emit("chat", finalText); 
-                }, 1000);
-              }
-              
-              $scope.$apply();
-              
-            };
-            
-            
-            recog.start();
           } else {
             $scope.log += "このブラウザは speechRecognition 非対応\n";
+            
           }
           
           $scope.log += "getUserMedia 対応\n";
@@ -73,7 +51,6 @@
           var members = {};
           
           navigator.getUserMedia({ audio: true }, function (stream) {
-            var peer;
             socket = io();
             
             socket.on('connect', function () {
@@ -100,6 +77,7 @@
                 $scope.log += members[call.peer] + "(" + call.peer + ") にcallされました。\n";
                 $scope.$apply();
                 
+                flag_talking = true;
                 call.answer(stream);
               });
             });
@@ -107,8 +85,7 @@
             // 受信した全てのP2Pkeyをaudio要素に変換する
             socket.on('member', function (m) {
               if (peer.id == null) {
-                alert("新しい通話を検出しました。リロードします。");
-                $window.location.reload();
+                $scope.log += "[エラー] Peerサーバに接続できませんでした。\n";
                 return;
               }
               
@@ -118,6 +95,8 @@
               audios.innerHTML = '';
               
               delete m[socket.id]; // 自分自身を無視
+              
+              flag_talking = false;
     
               for(var key in m) {
                 var call = peer.call(key, stream);
@@ -128,10 +107,10 @@
                   console.log(peer);
                   $scope.$apply();
                   
-                  $window.rero
                   return;
                 }
                 
+                flag_talking = true;
                 call.on('stream', function (remoteStream) {
                   var audio = new Audio;
                   audio.src = URL.createObjectURL(remoteStream);
@@ -163,6 +142,75 @@
           $scope.log += "このブラウザは getUserMedia 非対応\n";
           $scope.$apply();
         }
+      }
+ 
+      function vr() {
+          var recog = new webkitSpeechRecognition();
+          recog.lang = 'ja-JP';
+          recog.interimResults = true;
+          recog.continuous = true;
+
+          recog.onend = function() {
+            // 認識終了
+            $scope.mic_anime_visible = false;
+            $scope.mic_stop_visible = true;
+            
+            $scope.interimArea = "[ 認識停止 ]";
+            $scope.$apply();
+          };
+
+          recog.onsoundstart = function() {
+              // 認識開始
+              $scope.mic_anime_visible = true;
+              $scope.mic_stop_visible = false;
+              
+              $scope.interimArea = "[ 認識開始 ]";
+              $scope.$apply();
+          };
+          
+          recog.onnomatch = function() {
+            // もう一度試してください
+            $scope.interimArea = "[ もう一度発声してください ]";
+            $scope.$apply();
+          };
+          recog.onerror = function() {
+            // エラー
+            $scope.interimArea = "[ 認識エラー ]";
+            $scope.$apply();
+            
+            if(!flag_speech)
+              vr();
+          };
+          recog.onsoundend = function() {
+            // 停止中
+            $scope.interimArea = "[ 停止中 ]";
+            $scope.$apply();
+              
+            vr();
+          };
+
+          recog.onresult = function(e) {
+              for (var i = e.resultIndex; i < event.results.length; i++) {
+                var result = e.results.item(i);
+                if (result.isFinal)
+                {
+                  if (flag_talking) {
+                    socket.emit("chat", result.item(0).transcript);
+                  }
+                    
+                  vr();
+                }
+                else
+                {
+                    $scope.interimArea = result.item(0).transcript;
+                    $scope.$apply();
+                    flag_speech = true;
+                }
+              }
+          }
+          
+          flag_speech = false;
+          recog.start();
       }
     
   }]);
