@@ -15,9 +15,12 @@ block content
         button.btn.btn-primary(type="submit", ng-disabled="callForm.$invalid") 通話開始
   
   h3 議事録(的にな何か)
-  pre(style="width: 50%;") {{ chat }}
+  div.well(style="width: 50%;") {{ chat }}
   
-  pre(style="width: 30%;")
+  div.alert.alert-info.alert-dismissible(style="width: 30%;", role="alert")
+    button.close(type="button", data-dismiss="alert", aria-label="閉じる")
+      span(aria-hidden="true") ×
+  
     img(style="border: 1px solid black;", ng-show="mic_anime_visible", src="/images/mic_animated.gif", height="30", align="right")
     img(style="border: 1px solid black;", ng-show="mic_stop_visible", src="/images/mic_stop.png", height="30", align="right")
     {{ "* 認識中の内容\n" + interimArea }}
