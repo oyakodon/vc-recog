@@ -26,7 +26,7 @@ block content
     {{ "* 認識中の内容\n" + interimArea }}
   
   h3 ( ログ )
-  pre(style="width: 50%;") {{ log }}
+  div.well(style="width: 50%;") {{ log }}
 
 block scripts
   script(src='/socket.io/socket.io.js')

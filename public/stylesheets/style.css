@@ -6,3 +6,5 @@ body {
 a {
   color: #00B7FF;
 }
+
+div.well  { white-space: pre-wrap; }
