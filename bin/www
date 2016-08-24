@@ -90,6 +90,7 @@ function onListening() {
 }
 
 var members = {};
+var chats = [""];
 var io = require('socket.io').listen(server);
 
 io.sockets.on('connection', function(socket) {
@@ -99,6 +100,7 @@ io.sockets.on('connection', function(socket) {
   socket.on('connected', function (name) {
     members[id] = name;
     
+    io.emit('getChats', {"id": id, "chats": chats});
     io.emit('member', members);
     console.log(id + ' connected.\nmembers:', members);
     
@@ -107,6 +109,7 @@ io.sockets.on('connection', function(socket) {
   // 音声認識チャット
   socket.on('chat', function (chat) {
     io.emit('chat', {"name" : members[id], "message" : chat});
+    chats.unshift(members[id] + " : " + chat);
     console.log(members[id] + " : " + chat);
   });
 

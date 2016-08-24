@@ -16,7 +16,7 @@ block content
     form.form-horizontal(name="callForm", ng-submit="startCall()", ng-show="form_enabled", novalidate)
       h2
         span.glyphicon.glyphicon-wrench(aria-hidden="true", style="font-size: 25px; margin-right: 10px;")
-        設定
+        | 設定
         
       div.form-group
         label.col-xs-1.control-label 名前 : 
@@ -38,11 +38,11 @@ block content
     div.well.bg-info(style="max-width: 400px;")
       img(style="border: 1px solid black;", ng-show="mic_anime_visible", src="/images/mic_animated.gif", height="30", align="right")
       img(style="border: 1px solid black;", ng-show="mic_stop_visible", src="/images/mic_stop.png", height="30", align="right")
-      * 認識中の内容　
+      | * 認識中の内容　
       button.btn.btn-primary.btn-xs(ng-click="submitInterim()", ng-disabled="interimBtnDisabled") 送信
       button.btn.btn-danger.btn-xs(ng-click="cancel()", ng-disabled="cancelBtnDisabled", style="margin-left: 10px;") 取り消し
       br
-      {{ interimArea }}
+      | {{ interimArea }}
 
 block scripts
   script(src='/socket.io/socket.io.js')

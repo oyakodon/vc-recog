@@ -100,6 +100,16 @@
               });
             });
           
+            // 今までのログを取得
+            socket.on('getChats', function (data) {
+              if(data.id == socket.id) {
+                for(var c in data.chats) {
+                  $scope.chat += data.chats[c] + "\n";
+                }
+              }
+              $scope.$apply();
+            });
+          
             // 受信した全てのP2Pkeyをaudio要素に変換する
             socket.on('member', function (m) {
               if (peer.id == null) {
