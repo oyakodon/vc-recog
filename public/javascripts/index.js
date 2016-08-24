@@ -6,9 +6,12 @@
       $scope.form_enabled = true;
       $scope.mic_anime_visible = false;
       $scope.mic_stop_visible = true;
+      $scope.interimBtnDisabled = true;
+      $scope.cancelBtnDisabled = true;
       
       var flag_speech = false;
       var flag_talking = false;
+      var interimText = "";
       
       var socket;
       var peer;
@@ -21,6 +24,21 @@
         secure : true,
         key : 'peerjs',
         debug : 3
+      };
+      
+      $scope.submitInterim = function() {
+        $scope.interimBtnDisabled = true;
+        $scope.cancelBtnDisabled = true;
+        
+        socket.emit("chat", interimText);
+        vr();
+      };
+      
+      $scope.cancel = function() {
+        $scope.interimBtnDisabled = true;
+        $scope.cancelBtnDisabled = true;
+        
+        vr();
       };
       
       // peerjs
@@ -97,7 +115,10 @@
               delete m[socket.id]; // 自分自身を無視
               
               flag_talking = false;
-    
+              
+              var memberCount = 0;
+              $scope.log += "Member: [ ";
+              
               for(var key in m) {
                 var call = peer.call(key, stream);
                 
@@ -120,12 +141,23 @@
                   audios.appendChild(audio);
 
                 });
+                
+                if (memberCount == 0) {
+                  $scope.log += m[key];
+                } else {
+                  $scope.log += " / " + m[key];
+                }
+                
+                memberCount++;
               }
+              
+              $scope.log += " ]\n(" + memberCount + "人)\n";
+              $scope.$apply();
             });
             
             // Chat受信時 chat = name, message
             socket.on('chat', function(chat) {
-              $scope.chat += chat.name + " : " + chat.message + "\n";
+              $scope.chat = chat.name + " : " + chat.message + "\n" + $scope.chat;
               $scope.$apply();
             });
     
@@ -196,15 +228,25 @@
                 {
                   if (flag_talking) {
                     socket.emit("chat", result.item(0).transcript);
-                  }
                     
+                    $scope.interimBtnDisabled = true;
+                    $scope.cancelBtnDisabled = true;
+                    $scope.$apply();
+                  }
+                  
                   vr();
                 }
                 else
                 {
-                    $scope.interimArea = result.item(0).transcript;
-                    $scope.$apply();
-                    flag_speech = true;
+                  interimText = result.item(0).transcript;
+                  flag_speech = true;
+                  
+                  $scope.interimArea = interimText;
+                  if (flag_talking) {
+                    $scope.interimBtnDisabled = false;
+                    $scope.cancelBtnDisabled = false;
+                  }
+                  $scope.$apply();
                 }
               }
           }

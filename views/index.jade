@@ -2,31 +2,47 @@ extends layout
 
 block content
   h1= title
-  section#audios
   
-  form.form-horizontal(name="callForm", ng-submit="startCall()", ng-show="form_enabled", novalidate)
-    div.form-group
-      label.col-xs-1.control-label 名前 : 
-      div.col-xs-3
-        input.form-control(type="text", ng-model="name", required)
+  div(style="float: left; width: 20%;")
+    div.panel.panel-info(style="text-align: left;")
+      div.panel-heading
+        div.panel-title ログ(デバッグ用)
+        
+      div.panel-body(style="white-space: pre-wrap;") {{ log }}
+  
+  div(style="float: right; width: 80%; padding: 0px 0px 0px 25px; height: 100%;")
+    section#audios
+  
+    form.form-horizontal(name="callForm", ng-submit="startCall()", ng-show="form_enabled", novalidate)
+      h2
+        span.glyphicon.glyphicon-wrench(aria-hidden="true", style="font-size: 25px; margin-right: 10px;")
+        設定
+        
+      div.form-group
+        label.col-xs-1.control-label 名前 : 
+        div.col-xs-3
+          input.form-control(type="text", ng-model="name", required)
+          
+      div.form-group
+        div.col-xs-offset-1.col-xs-3
+          button.btn.btn-primary(type="submit", ng-disabled="callForm.$invalid") 通話開始
+
     
-    div.form-group
-      div.col-xs-offset-1.col-xs-10
-        button.btn.btn-primary(type="submit", ng-disabled="callForm.$invalid") 通話開始
+    div.panel.panel-primary(style="max-width: 700px; height: 50%;")
+      div.panel-heading
+        div.panel-title 議事録
+    
+      div.panel-body(style="white-space: pre-wrap; height: calc(100% - 43px); overflow:scroll;　margin: 0px;") {{ chat }}
   
-  h3 議事録(的にな何か)
-  div.well(style="width: 50%;") {{ chat }}
-  
-  div.alert.alert-info.alert-dismissible(style="width: 30%;", role="alert")
-    button.close(type="button", data-dismiss="alert", aria-label="閉じる")
-      span(aria-hidden="true") ×
-  
-    img(style="border: 1px solid black;", ng-show="mic_anime_visible", src="/images/mic_animated.gif", height="30", align="right")
-    img(style="border: 1px solid black;", ng-show="mic_stop_visible", src="/images/mic_stop.png", height="30", align="right")
-    {{ "* 認識中の内容\n" + interimArea }}
-  
-  h3 ( ログ )
-  div.well(style="width: 50%;") {{ log }}
+    
+    div.well.bg-info(style="max-width: 400px;")
+      img(style="border: 1px solid black;", ng-show="mic_anime_visible", src="/images/mic_animated.gif", height="30", align="right")
+      img(style="border: 1px solid black;", ng-show="mic_stop_visible", src="/images/mic_stop.png", height="30", align="right")
+      * 認識中の内容　
+      button.btn.btn-primary.btn-xs(ng-click="submitInterim()", ng-disabled="interimBtnDisabled") 送信
+      button.btn.btn-danger.btn-xs(ng-click="cancel()", ng-disabled="cancelBtnDisabled", style="margin-left: 10px;") 取り消し
+      br
+      {{ interimArea }}
 
 block scripts
   script(src='/socket.io/socket.io.js')
